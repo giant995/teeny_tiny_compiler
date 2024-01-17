@@ -1,6 +1,8 @@
 class Lexer:
     def __init__(self, source):
         """
+        Set the current character and current position of the source string then load the first character.
+
         :param source: Source code to lex as a string. We append a newline to simplify lexing/parsing the last
         token/statement
         """
