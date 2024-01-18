@@ -16,7 +16,7 @@ class Token:
         self.kind = tokenKind
 
     @staticmethod
-    def checkIfToken(tokenText):
+    def checkIfKeyword(tokenText):
         """
         Decides if a token text is a keyword or not.
 
