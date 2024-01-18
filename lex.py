@@ -15,6 +15,19 @@ class Token:
         self.text = tokenText
         self.kind = tokenKind
 
+    @staticmethod
+    def checkIfToken(tokenText):
+        """
+        Decides if a token text is a keyword or not.
+
+        :param tokenText: The token text to analyze
+        :return: The TokenType if it is a keyword, None otherwise
+        """
+        for kind in TokenType:
+            if kind.name == tokenText and 100 <= kind.value < 200:
+                return kind
+        return None
+
 
 class TokenType(enum.Enum):
     """Enum for all the types of tokens."""
@@ -154,6 +167,34 @@ class Lexer:
 
                 subtext = self.source[startPos:self.curPos]
                 token = Token(subtext, TokenType.STRING)
+        elif self.curChar.isdigit():
+            # Get every digit and the optional decimal point
+            startPos = self.curPos
+
+            while self.peek().isdigit():
+                self.nextChar()
+            if self.peek() == ".":
+                self.nextChar()
+
+                if not self.peek().isdigit():
+                    self.abort("Illegal character in number")
+                while self.peek().isdigit():
+                    self.nextChar()
+
+            number = self.source[startPos:self.curPos + 1]
+            token = Token(number, TokenType.NUMBER)
+        elif self.curChar.isalpha():
+            # Leading character is a letter, so this must be an identifier
+            # Get all consecutive alphanumeric characters
+            startPos = self.curPos
+            while self.peek().isalnum():
+                self.nextChar()
+            tokText = self.source[startPos:self.curPos+1]
+            keyword = Token.checkIfKeyword(tokText)
+            if keyword == None:
+                token = Token(tokText, TokenType.IDENT)
+            else:
+                token = Token(tokText, keyword)
         elif self.curChar == "\n":
             token = Token(self.curChar, TokenType.NEWLINE)
         elif self.curChar == "\0":
