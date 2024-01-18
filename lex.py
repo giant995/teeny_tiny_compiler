@@ -89,7 +89,9 @@ class Lexer:
 
     def skipComment(self):
         """Skip comments in the code."""
-        pass
+        if self.curChar == "#":
+            while self.curChar != "\n":
+                self.nextChar()
 
     def getToken(self):
         """
@@ -97,6 +99,7 @@ class Lexer:
         If it is a multiple character operator (e.g.: !=), number, identifier or keyword then we will process the rest.
         """
         self.skipWhitespace()
+        self.skipComment()
         token = None
 
         if self.curChar == "+":
