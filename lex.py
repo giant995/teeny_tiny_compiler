@@ -1,4 +1,5 @@
 import enum
+import sys
 
 
 class Token:
@@ -61,9 +62,9 @@ class Lexer:
         self.source = source + "\n"
         self.curChar = ""
         self.curPos = -1
-        self.next_char()
+        self.nextChar()
 
-    def next_char(self):
+    def nextChar(self):
         """Process the next character."""
         self.curPos += 1
         if self.curPos >= len(self.source):
@@ -79,11 +80,12 @@ class Lexer:
 
     def abort(self, message):
         """Invalid token found, print error message and exit."""
-        pass
+        sys.exit("Lexing error. " + message)
 
     def skipWhitespace(self):
         """Skip whitespace except newlines, which we use to indicate the end of a statement."""
-        pass
+        while self.curChar == " " or self.curChar == "\t" or self.curChar == "\r":
+            self.nextChar()
 
     def skipComment(self):
         """Skip comments in the code."""
@@ -94,6 +96,7 @@ class Lexer:
         Return the next token. Check the first character of this token to see if it can decide what it is.
         If it is a multiple character operator (e.g.: !=), number, identifier or keyword then we will process the rest.
         """
+        self.skipWhitespace()
         token = None
 
         if self.curChar == "+":
@@ -104,12 +107,40 @@ class Lexer:
             token = Token(self.curChar, TokenType.ASTERISK)
         elif self.curChar == "/":
             token = Token(self.curChar, TokenType.SLASH)
+        elif self.curChar == "=":
+            if self.peek() == "=":
+                lastChar = self.curChar
+                self.nextChar()
+                token = Token(lastChar + self.curChar, TokenType.EQEQ)
+            else:
+                token = Token(self.curChar, TokenType.EQ)
+        elif self.curChar == ">":
+            if self.peek() == "=":
+                lastChar = self.curChar
+                self.nextChar()
+                token = Token(lastChar + self.curChar, TokenType.GTEQ)
+            else:
+                token = Token(self.curChar, TokenType.GT)
+        elif self.curChar == "<":
+            if self.peek() == "=":
+                lastChar = self.curChar
+                self.nextChar()
+                token = Token(lastChar + self.curChar, TokenType.LTEQ)
+            else:
+                token = Token(self.curChar, TokenType.LT)
+        elif self.curChar == "!":
+            if self.peek() == "=":
+                lastChar = self.curChar
+                self.nextChar()
+                token = Token(lastChar + self.curChar, TokenType.NOTEQ)
+            else:
+                self.abort("Expected !=, got !" + self.peek())
         elif self.curChar == "\n":
             token = Token(self.curChar, TokenType.NEWLINE)
         elif self.curChar == "\0":
             token = Token(self.curChar, TokenType.EOF)
         else:  # unknown token
-            pass
+            self.abort("Unknown token: " + self.curChar)
 
-        self.next_char()
+        self.nextChar()
         return token
