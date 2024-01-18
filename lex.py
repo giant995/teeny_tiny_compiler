@@ -138,6 +138,22 @@ class Lexer:
                 token = Token(lastChar + self.curChar, TokenType.NOTEQ)
             else:
                 self.abort("Expected !=, got !" + self.peek())
+        elif self.curChar == "\"":
+            # Get characters between quotations.
+            self.nextChar()
+            startPos = self.curPos
+
+            while self.curChar != "\"":
+                # Don't allow special characters in the string. No escape characters, newlines, tab or %.
+                if (
+                        self.curChar == "\r" or self.curChar == "\n" or self.curChar == "\t"
+                        or self.curChar == "\\" or self.curChar == "%"
+                ):
+                    self.abort("Illegal")
+                self.nextChar()
+
+                subtext = self.source[startPos:self.curPos]
+                token = Token(subtext, TokenType.STRING)
         elif self.curChar == "\n":
             token = Token(self.curChar, TokenType.NEWLINE)
         elif self.curChar == "\0":
