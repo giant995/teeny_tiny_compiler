@@ -74,6 +74,9 @@ class Parser:
         """
 
         print("PROGRAM")
+        # Grammar requires some newlines, need to skip the excess
+        while self.checkToken(TokenType.NEWLINE):
+            self.nextToken()
 
         while not self.checkToken(TokenType.EOF):
             self.statement()
