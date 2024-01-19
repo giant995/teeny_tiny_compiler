@@ -44,7 +44,7 @@ class Parser:
 
     def match(self, kind):
         """
-        Try to match the current token. If not, error.
+        Try to match the current token, then seek the next token. If not, raise an error.
 
         :return:
         """
@@ -87,11 +87,68 @@ class Parser:
         if self.checkToken(TokenType.PRINT):
             print("STATEMENT-PRINT")
             self.nextToken()
+            if self.checkToken(TokenType.STRING):
+                self.nextToken()
+            else:
+                self.expression()
 
-        if self.checkToken(TokenType.STRING):
+        # "IF" comparison "THEN" {statement} "ENDIF"
+        elif self.checkToken(TokenType.IF):
+            print("STATEMENT-IF")
             self.nextToken()
-        else:
+            self.comparison
+
+            self.match(TokenType.THEN)
+            self.nl()
+
+            # zero or more statements in the body
+            while not self.checkToken(TokenType.ENDIF):
+                self.statement()
+
+            self.match(TokenType.ENDIF)
+
+        # "WHILE" comparison "REPEAT" nl {statement nl} "ENDWHILE" nl
+        elif self.checkToken(TokenType.WHILE):
+            print("STATEMENT-WHILE")
+            self.nextToken()
+            self.comparison()
+
+            self.match(TokenType.REPEAT)
+            self.nl()
+
+            while not self.checkToken(TokenType.ENDWHILE):
+                self.statement()
+
+            self.match(TokenType.ENDWHILE)
+
+        # "LABEL" ident nl
+        elif self.checkToken(TokenType.LABEL):
+            print("STATEMENT-LABEL")
+            self.nextToken()
+            self.match(TokenType.IDENT)
+
+        # "GOTO" ident nl
+        elif self.checkToken(TokenType.GOTO):
+            print("STATEMENT-GOTO")
+            self.nextToken()
+            self.match(TokenType.IDENT)
+
+        # "LET" ident "=" expression nl
+        elif self.checkToken(TokenType.GOTO):
+            print("STATEMENT-LET")
+            self.nextToken()
+            self.match(TokenType.IDENT)
+            self.match(TokenType.EQ)
             self.expression()
+
+        # "INPUT" ident nl
+        elif self.checkToken(TokenType.INPUT):
+            print("STATEMENT-INPUT")
+            self.nextToken()
+            self.match(TokenType.IDENT)
+
+        else:
+            self.abort("Invalid statement at " + self.curToken.text + " (" + self.curToken.kind.name + ")")
 
         self.nl()
 
