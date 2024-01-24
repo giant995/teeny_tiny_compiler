@@ -137,7 +137,7 @@ class Parser:
             self.match(TokenType.IDENT)
 
         # "LET" ident "=" expression nl
-        elif self.checkToken(TokenType.GOTO):
+        elif self.checkToken(TokenType.LET):
             print("STATEMENT-LET")
             self.nextToken()
             self.match(TokenType.IDENT)
@@ -199,7 +199,7 @@ class Parser:
         self.term()
 
         # Can have 0 or more of -/+ and expressions
-        while self.checkToken(TokenType.PLUS) or self.checkToken(TokenType.MINUS):
+        while self.checkToken(TokenType.MINUS) or self.checkToken(TokenType.PLUS):
             self.nextToken()
             self.term()
 
@@ -231,7 +231,7 @@ class Parser:
         primary ::= number | ident
         """
 
-        print("PRIMARY")
+        print("PRIMARY (" + self.curToken.text + ")")
         if self.checkToken(TokenType.NUMBER):
             self.nextToken()
         elif self.checkToken(TokenType.IDENT):
