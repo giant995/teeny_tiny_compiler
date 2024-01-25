@@ -165,8 +165,8 @@ class Lexer:
                     self.abort("Illegal")
                 self.nextChar()
 
-                subtext = self.source[startPos:self.curPos]
-                token = Token(subtext, TokenType.STRING)
+            subtext = self.source[startPos:self.curPos]
+            token = Token(subtext, TokenType.STRING)
         elif self.curChar.isdigit():
             # Get every digit and the optional decimal point
             startPos = self.curPos
@@ -189,9 +189,10 @@ class Lexer:
             startPos = self.curPos
             while self.peek().isalnum():
                 self.nextChar()
+
             tokText = self.source[startPos:self.curPos+1]
             keyword = Token.checkIfKeyword(tokText)
-            if keyword == None:
+            if keyword is None:  # Identifier
                 token = Token(tokText, TokenType.IDENT)
             else:
                 token = Token(tokText, keyword)
